@@ -18,6 +18,8 @@ const uint8_t CMDBUFFER_CHAR_CR        = 0x0D;
 const uint8_t CMDBUFFER_CHAR_BS        = 0x08;
 const uint8_t CMDBUFFER_CHAR_DEL       = 0x7F;
 
+typedef void (*writeCallback)(const uint8_t writeChar);
+
 /**
  *
  *
@@ -58,6 +60,19 @@ class CmdBufferObject
      *                      FALSE if not.
      */
     bool readSerialChar(Stream *serial);
+
+    /**
+     * stuff one char to buffer.
+
+     *
+     * @param readChar      the character to process
+     * @param callback      single character write callback, signature:
+     *                      typedef void (*writeCallback)(const uint8_t
+     writeChar);
+     * @return              TRUE if data readed until end character or
+     *                      FALSE if not.
+     */
+    bool processChar(uint8_t readChar, writeCallback callback);
 
     /**
      * Set a ASCII character for serial cmd end.

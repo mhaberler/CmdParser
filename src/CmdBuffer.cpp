@@ -112,3 +112,37 @@ bool CmdBufferObject::readSerialChar(Stream *serial)
     }
     return false;
 }
+
+bool CmdBufferObject::processChar(const uint8_t readChar,
+                                  writeCallback callback)
+{
+    uint8_t *buffer = this->getBuffer();
+
+    if (m_echo) {
+        callback(readChar);
+    }
+
+    // is that the end of command
+    if (readChar == m_endChar) {
+        buffer[m_dataOffset] = '\0';
+        m_dataOffset         = 0;
+        return true;
+    }
+
+    // is that a backspace char?
+    if ((readChar == m_bsChar) && (m_dataOffset > 0)) {
+        // buffer[--m_dataOffset] = 0;
+        --m_dataOffset;
+        if (m_echo) {
+            callback(' ');
+            callback(readChar);
+        }
+        return false;
+    }
+
+    // is a printable character
+    if (readChar > CMDBUFFER_CHAR_PRINTABLE) {
+        buffer[m_dataOffset++] = readChar;
+    }
+    return false;
+}

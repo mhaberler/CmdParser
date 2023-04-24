@@ -49,6 +49,16 @@ class CmdCallbackObject
     virtual bool processCmd(CmdParser *cmdParser);
 
     /**
+     * pass single new char and if it was the endChar
+     *
+     * @param cmdParser         Parser object with options set
+     * @param cmdBuffer         Buffer object for data handling
+     * @param readChar          the character to be passed
+     */
+    void updateCmdProcessing(CmdParser *cmdParser, CmdBufferObject *cmdBuffer,
+                             const uint8_t readChar, writeCallback callback);
+
+    /**
      * Check for single new char on serial and if it was the endChar
      *
      * @param cmdParser         Parser object with options set

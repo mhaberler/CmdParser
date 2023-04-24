@@ -6,9 +6,9 @@
 
 #include "CmdCallback.hpp"
 
-void CmdCallbackObject::loopCmdProcessing(CmdParser *      cmdParser,
+void CmdCallbackObject::loopCmdProcessing(CmdParser       *cmdParser,
                                           CmdBufferObject *cmdBuffer,
-                                          Stream *         serial)
+                                          Stream          *serial)
 {
     do {
         // read data
@@ -47,12 +47,28 @@ bool CmdCallbackObject::processCmd(CmdParser *cmdParser)
     return false;
 }
 
-void CmdCallbackObject::updateCmdProcessing(CmdParser *      cmdParser,
+void CmdCallbackObject::updateCmdProcessing(CmdParser       *cmdParser,
                                             CmdBufferObject *cmdBuffer,
-                                            Stream *         serial)
+                                            Stream          *serial)
 {
     // read data and check if command was entered
     if (cmdBuffer->readSerialChar(serial)) {
+        // parse command line
+        if (cmdParser->parseCmd(cmdBuffer) != CMDPARSER_ERROR) {
+            // search command in store and call function
+            // ignore return value "false" if command was not found
+            this->processCmd(cmdParser);
+            cmdBuffer->clear();
+        }
+    }
+}
+void CmdCallbackObject::updateCmdProcessing(CmdParser       *cmdParser,
+                                            CmdBufferObject *cmdBuffer,
+                                            const uint8_t    readChar,
+                                            writeCallback    callback)
+{
+    // read data and check if command was entered
+    if (cmdBuffer->processChar(readChar, callback)) {
         // parse command line
         if (cmdParser->parseCmd(cmdBuffer) != CMDPARSER_ERROR) {
             // search command in store and call function
