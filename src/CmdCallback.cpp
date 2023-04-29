@@ -54,28 +54,33 @@ void CmdCallbackObject::updateCmdProcessing(CmdParser       *cmdParser,
     // read data and check if command was entered
     if (cmdBuffer->readSerialChar(serial)) {
         // parse command line
-        if (cmdParser->parseCmd(cmdBuffer) != CMDPARSER_ERROR) {
+        uint16_t status = cmdParser->parseCmd(cmdBuffer);
+        if (status != CMDPARSER_ERROR) {
             // search command in store and call function
             // ignore return value "false" if command was not found
             this->processCmd(cmdParser);
             cmdBuffer->clear();
         }
+        // call completion cb
     }
 }
 void CmdCallbackObject::updateCmdProcessing(CmdParser       *cmdParser,
                                             CmdBufferObject *cmdBuffer,
                                             const uint8_t    readChar,
-                                            writeCallback    callback)
+                                            writeCallback    callback,
+                                            CmdCompleteFunct complete)
 {
     // read data and check if command was entered
     if (cmdBuffer->processChar(readChar, callback)) {
         // parse command line
-        if (cmdParser->parseCmd(cmdBuffer) != CMDPARSER_ERROR) {
+        uint16_t status = cmdParser->parseCmd(cmdBuffer);
+        if (status != CMDPARSER_ERROR) {
             // search command in store and call function
-            // ignore return value "false" if command was not found
-            this->processCmd(cmdParser);
-            cmdBuffer->clear();
+            bool found = this->processCmd(cmdParser);
+            if (complete)
+                complete(*cmdParser, found);
         }
+        cmdBuffer->clear();
     }
 }
 

@@ -22,6 +22,7 @@
 #include "CmdParser.hpp"
 
 typedef void (*CmdCallFunct)(CmdParser *cmdParser);
+typedef void (*CmdCompleteFunct)(CmdParser &cmdParser, bool found);
 
 /**
  *
@@ -56,7 +57,9 @@ class CmdCallbackObject
      * @param readChar          the character to be passed
      */
     void updateCmdProcessing(CmdParser *cmdParser, CmdBufferObject *cmdBuffer,
-                             const uint8_t readChar, writeCallback callback);
+                             const uint8_t    readChar,
+                             writeCallback    callback = NULL,
+                             CmdCompleteFunct complete = NULL);
 
     /**
      * Check for single new char on serial and if it was the endChar
